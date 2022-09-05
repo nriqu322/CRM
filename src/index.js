@@ -2,13 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const sequelize = require('./db');
-require('./models/Customers');
-require('./models/Contacts');
-require('./models/Projects');
-require('./models/Meetings');
 
 const contactRoutes = require('./routes/contacts.routes');
 const customerRoutes = require('./routes/customers.routes');
+const meetingRoutes = require('./routes/meetings.routes');
+const projectRoutes = require('./routes/projects.routes');
 
 const app = express();
 
@@ -18,6 +16,8 @@ app.use(express.json());
 
 app.use(contactRoutes);
 app.use(customerRoutes);
+app.use(meetingRoutes);
+app.use(projectRoutes);
 
 app.use((err, req, res, next) => res.json({
   message: err.message,
@@ -25,7 +25,7 @@ app.use((err, req, res, next) => res.json({
 
 async function main() {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     app.listen(4000);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
