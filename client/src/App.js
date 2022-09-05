@@ -18,6 +18,7 @@ export default function App() {
         <Routes>
           <Route path='/' element={<CustomerList />} />
           <Route path='/customers/new' element={<CustomerForm />} />
+          <Route path='/customers/:id/edit' element={<CustomerForm />} />
           <Route path='/projects' element={<ProjectList />} />
           <Route path='/projects/new' element={<ProjectForm />} />
           <Route path='/contacts' element={<ContactList />} />
