@@ -1,6 +1,9 @@
 # USERLAB TEST : CRM
 
-### Postgres User Test
+## ERD CRM
+
+<img src="resources/diagram.png" width=768 />
+## Postgres credentials
 
 Please copy this to a .env file
 
