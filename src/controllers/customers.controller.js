@@ -1,9 +1,10 @@
-const pool = require('../db');
+const Customers = require('../models/Customers');
+const Projects = require('../models/Projects');
 
 const getAllCustomers = async (req, res, next) => {
   try {
-    const allCustomers = await pool.query('SELECT * FROM customers');
-    res.json(allCustomers.rows);
+    const allCustomers = await Customers.findAll();
+    res.json(allCustomers);
   } catch (error) {
     next(error);
   }
@@ -12,25 +13,29 @@ const getAllCustomers = async (req, res, next) => {
 const getCustomer = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('SELECT * FROM customers WHERE id = $1', [id]);
+    const customer = await Customers.findOne({
+      where: {
+        id,
+      },
+    });
 
-    if (result.rows.length === 0) {
+    if (customer === null) {
       return res.status(404).json({
         message: 'Customer not found',
       });
     }
-    return res.json(result.rows[0]);
+    return res.json(customer);
   } catch (error) {
     next(error);
   }
 };
 
 const createCustomer = async (req, res, next) => {
-  const customerName = req.body.customer_name;
+  const { name } = req.body;
 
   try {
-    const result = await pool.query('INSERT INTO customers (customer_name) VALUES ($1) RETURNING *', [customerName]);
-    res.send(result.rows[0]);
+    const newCustomer = await Customers.create(name);
+    res.send(newCustomer);
   } catch (error) {
     next(error);
   }
@@ -39,32 +44,59 @@ const createCustomer = async (req, res, next) => {
 const updateCustomer = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const customerName = req.body.customer_name;
-    const result = await pool.query('UPDATE customers SET customer_name = $1 WHERE id = $2 RETURNING *', [customerName, id]);
-    if (result.rows.length === 0) {
+    const { name } = req.body;
+    const customer = await Customers.findOne({
+      where: {
+        id,
+      },
+    });
+    customer.name = name;
+    await customer.save();
+
+    if (customer === null) {
       return res.status(404).json({
         message: 'Customer not found',
       });
     }
-    return res.json(result.rows[0]);
+    res.json(customer);
   } catch (error) {
     next(error);
   }
-
-
 };
 
 const deleteCustomer = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('DELETE FROM customers WHERE id = $1', [id]);
+    const customer = await Customers.destroy({
+      where: {
+        id,
+      },
+    });
 
-    if (result.rowCount === 0) {
+    if (customer === null) {
       return res.status(404).json({
         message: 'Customer not found',
       });
     }
     return res.sendStatus(204);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getCustomerProjects = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const projects = await Projects.findAll({
+      where: { customerId: id },
+    });
+
+    if (projects === null) {
+      return res.status(404).json({
+        message: 'Projects not found for this customer',
+      });
+    }
+    return res.json(projects);
   } catch (error) {
     next(error);
   }
@@ -76,4 +108,5 @@ module.exports = {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getCustomerProjects,
 };
