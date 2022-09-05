@@ -11,12 +11,12 @@ const router = Router();
 
 router.get('/contacts', getAllContacts);
 
-router.get('/contacts/1', getContact);
+router.get('/contacts/:id', getContact);
 
 router.post('/contacts', createContact);
 
-router.put('/contacts', updateContact);
+router.put('/contacts/:id', updateContact);
 
-router.delete('/contacts', deleteContact);
+router.delete('/contacts/:id', deleteContact);
 
 module.exports = router;
